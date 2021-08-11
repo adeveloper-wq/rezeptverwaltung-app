@@ -33,13 +33,13 @@ class UserPreferences {
   void removeUser() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
+    prefs.remove("userId");
     prefs.remove("name");
     prefs.remove("email");
-    prefs.remove("phone");
     prefs.remove("accessToken");
   }
 
-  Future<String> getToken(args) async {
+  Future<String> getToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String accessToken = prefs.getString("accessToken");
     return accessToken;

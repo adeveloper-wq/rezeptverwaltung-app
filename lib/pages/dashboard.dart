@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rezeptverwaltung/domains/user.dart';
+import 'package:rezeptverwaltung/providers/auth_refresh_provider.dart';
 import 'package:rezeptverwaltung/providers/user_provider.dart';
+import 'package:rezeptverwaltung/util/user_preferences.dart';
 
 class DashBoard extends StatefulWidget {
   @override
@@ -9,11 +11,15 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
+  User user;
+  @override
+  void initState() {
+    user = context.read<UserProvider>().user;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    User user = Provider.of<UserProvider>(context).user;
-
     return Scaffold(
       appBar: AppBar(
         title: Text("DASHBOARD PAGE"),
@@ -22,9 +28,17 @@ class _DashBoardState extends State<DashBoard> {
       body: Column(
         children: [
           SizedBox(height: 100,),
-          Center(child: Text(user.email)),
+          Center(child: Text(user != null ? user.email : '')),
           SizedBox(height: 100),
-          RaisedButton(onPressed: (){}, child: Text("Logout"), color: Colors.lightBlueAccent,)
+          RaisedButton(
+            onPressed: (){
+              UserPreferences().removeUser();
+              context.read<UserProvider>().setUser(null);
+              Navigator.pushReplacementNamed(context, '/login');
+            },
+            child: Text("Logout"),
+            color: Colors.lightBlueAccent,
+          )
         ],
       ),
     );

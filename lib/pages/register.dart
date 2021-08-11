@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rezeptverwaltung/domains/user.dart';
-import 'package:rezeptverwaltung/providers/auth.dart';
+import 'package:rezeptverwaltung/providers/auth_provider.dart';
 import 'package:rezeptverwaltung/providers/user_provider.dart';
 import 'package:rezeptverwaltung/util/validators.dart';
 import 'package:rezeptverwaltung/util/widgets.dart';
@@ -18,7 +18,6 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    AuthProvider auth = Provider.of<AuthProvider>(context);
 
     final usernameField = TextFormField(
       autofocus: false,
@@ -29,7 +28,7 @@ class _RegisterState extends State<Register> {
 
     final emailField = TextFormField(
       autofocus: false,
-      validator: validateEmail,
+      //validator: validateEmail,
       onSaved: (value) => _email = value,
       decoration: buildInputDecoration("E-Mail", Icons.mail),
     );
@@ -46,7 +45,7 @@ class _RegisterState extends State<Register> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Registering ... Please wait")
+        Text(" Lädt ... Bitte warten")
       ],
     );
 
@@ -54,15 +53,8 @@ class _RegisterState extends State<Register> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         FlatButton(
-          padding: EdgeInsets.all(0.0),
-          child: Text("Forgot password?",
-              style: TextStyle(fontWeight: FontWeight.w300)),
-          onPressed: () {
-          },
-        ),
-        FlatButton(
           padding: EdgeInsets.only(left: 0.0),
-          child: Text("Sign in", style: TextStyle(fontWeight: FontWeight.w300)),
+          child: Text("Anmelden", style: TextStyle(fontWeight: FontWeight.w300)),
           onPressed: () {
             Navigator.pushReplacementNamed(context, '/login');
           },
@@ -74,10 +66,10 @@ class _RegisterState extends State<Register> {
       final form = formKey.currentState;
       if (form.validate()) {
         form.save();
-        auth.register(_email, _username, _password).then((response) {
+        context.read<AuthProvider>().register(_email, _username, _password).then((response) {
           if (response['status']) {
             User user = response['data'];
-            Provider.of<UserProvider>(context, listen: false).setUser(user);
+            context.read<UserProvider>().setUser(user);
             Navigator.pushReplacementNamed(context, '/dashboard');
           } else {
             SnackBar(content: Text('Registration Failed: ' + response.toString()));
@@ -99,7 +91,6 @@ class _RegisterState extends State<Register> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 215.0),
                   label("E-Mail"),
                   SizedBox(height: 5.0),
                   emailField,
@@ -112,9 +103,9 @@ class _RegisterState extends State<Register> {
                   SizedBox(height: 10.0),
                   passwordField,
                   SizedBox(height: 20.0),
-                  auth.registeredInStatus == Status.Registering
+                  context.watch<AuthProvider>().state == Status.Loading
                       ? loading
-                      : longButtons("Register", doRegister),
+                      : longButtons("Registrieren", doRegister),
                   SizedBox(height: 5.0),
                   forgotLabel
                 ],

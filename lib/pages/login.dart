@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rezeptverwaltung/domains/user.dart';
-import 'package:rezeptverwaltung/providers/auth.dart';
+import 'package:rezeptverwaltung/providers/auth_provider.dart';
 import 'package:rezeptverwaltung/providers/user_provider.dart';
 import 'package:rezeptverwaltung/util/validators.dart';
 import 'package:rezeptverwaltung/util/widgets.dart';
@@ -18,28 +18,26 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    AuthProvider auth = Provider.of<AuthProvider>(context);
-
-    final usernameField = TextFormField(
+    final emailField = TextFormField(
       autofocus: false,
-      validator: validateEmail,
+      //validator: validateEmail,
       onSaved: (value) => _username = value,
-      decoration: buildInputDecoration("Confirm password", Icons.email),
+      decoration: buildInputDecoration("E-Mail eingeben", Icons.email),
     );
 
     final passwordField = TextFormField(
       autofocus: false,
       obscureText: true,
-      validator: (value) => value.isEmpty ? "Please enter password" : null,
+      validator: (value) => value.isEmpty ? "Bitte Passwort eingeben" : null,
       onSaved: (value) => _password = value,
-      decoration: buildInputDecoration("Confirm password", Icons.lock),
+      decoration: buildInputDecoration("Passwort eingeben", Icons.lock),
     );
 
     var loading = Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         CircularProgressIndicator(),
-        Text(" Authenticating ... Please wait")
+        Text(" Lädt ... Bitte warten")
       ],
     );
 
@@ -47,16 +45,8 @@ class _LoginState extends State<Login> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         FlatButton(
-          padding: EdgeInsets.all(0.0),
-          child: Text("Forgot password?",
-              style: TextStyle(fontWeight: FontWeight.w300)),
-          onPressed: () {
-//            Navigator.pushReplacementNamed(context, '/reset-password');
-          },
-        ),
-        FlatButton(
           padding: EdgeInsets.only(left: 0.0),
-          child: Text("Sign up", style: TextStyle(fontWeight: FontWeight.w300)),
+          child: Text("Registrieren", style: TextStyle(fontWeight: FontWeight.w300)),
           onPressed: () {
             Navigator.pushReplacementNamed(context, '/register');
           },
@@ -71,12 +61,12 @@ class _LoginState extends State<Login> {
         form.save();
 
         final Future<Map<String, dynamic>> successfulMessage =
-        auth.login(_username, _password);
+        context.read<AuthProvider>().login(_username, _password);
 
         successfulMessage.then((response) {
           if (response['status']) {
-            User user = response['user'];
-            Provider.of<UserProvider>(context, listen: false).setUser(user);
+            User user = response['data'];
+            context.read<UserProvider>().setUser(user);
             Navigator.pushReplacementNamed(context, '/dashboard');
           } else {
             SnackBar(content: Text('Failed Login: ' + response['message']['message'].toString()));
@@ -97,16 +87,15 @@ class _LoginState extends State<Login> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 250.0),
-                  label("Email"),
+                  label("E-Mail"),
                   SizedBox(height: 5.0),
-                  usernameField,
+                  emailField,
                   SizedBox(height: 20.0),
-                  label("Password"),
+                  label("Passwort"),
                   SizedBox(height: 5.0),
                   passwordField,
                   SizedBox(height: 20.0),
-                  auth.loggedInStatus == Status.Authenticating
+                  context.watch<AuthProvider>().state == Status.Loading
                       ? loading
                       : longButtons("Login", doLogin),
                   SizedBox(height: 5.0),

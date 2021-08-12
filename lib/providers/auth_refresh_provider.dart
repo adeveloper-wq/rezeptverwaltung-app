@@ -82,7 +82,7 @@ class AuthRefreshProvider with ChangeNotifier {
         notifyListeners();
         result = {
           'status': false,
-          'message': json.decode(responseUser.body)['error']
+          'message': 'Serverfehler'
         };
       }
     } else {
@@ -90,7 +90,7 @@ class AuthRefreshProvider with ChangeNotifier {
       notifyListeners();
       result = {
         'status': false,
-        'message': json.decode(response.body)['error']
+        'message': 'Serverfehler'
       };
     }
     return result;

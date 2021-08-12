@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rezeptverwaltung/pages/dashboard.dart';
+import 'package:rezeptverwaltung/pages/group_settings.dart';
 import 'package:rezeptverwaltung/pages/login.dart';
 import 'package:rezeptverwaltung/pages/register.dart';
+import 'package:rezeptverwaltung/pages/settings.dart';
 import 'package:rezeptverwaltung/providers/auth_provider.dart';
 import 'package:rezeptverwaltung/providers/auth_refresh_provider.dart';
+import 'package:rezeptverwaltung/providers/group_provider.dart';
 import 'package:rezeptverwaltung/providers/user_provider.dart';
 
 void main() {
@@ -19,6 +22,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => AuthRefreshProvider()),
           ChangeNotifierProvider(create: (_) => AuthProvider()),
           ChangeNotifierProvider(create: (_) => UserProvider()),
+          ChangeNotifierProvider(create: (_) => GroupProvider()),
         ],
         child: MyAppStateful()
     );
@@ -54,6 +58,8 @@ class _MyAppState extends State<MyAppStateful>{
             '/dashboard': (context) => DashBoard(),
             '/login': (context) => Login(),
             '/register': (context) => Register(),
+            '/settings': (context) => Settings(),
+            '/group_settings': (context) => GroupSettings(),
           }
     );
   }

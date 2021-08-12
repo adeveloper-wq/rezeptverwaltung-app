@@ -28,7 +28,7 @@ class _RegisterState extends State<Register> {
 
     final emailField = TextFormField(
       autofocus: false,
-      //validator: validateEmail,
+      validator: validateEmail,
       onSaved: (value) => _email = value,
       decoration: buildInputDecoration("E-Mail", Icons.mail),
     );
@@ -72,11 +72,11 @@ class _RegisterState extends State<Register> {
             context.read<UserProvider>().setUser(user);
             Navigator.pushReplacementNamed(context, '/dashboard');
           } else {
-            SnackBar(content: Text('Registration Failed: ' + response.toString()));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['message'])));
           }
         });
       } else {
-        SnackBar(content: Text('Invalid form, please complete the form properly.'));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Bitte alles richtig ausfüllen.')));
       }
 
     };

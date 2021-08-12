@@ -7,5 +7,7 @@ class AppUrl {
   static const String register = "/app/public/auth/register";
   static const String user = "/app/public/auth/me";
   static const String refresh = "/app/public/auth/refresh";
+
+  static const String getGroup = "/app/public/api/group/";
   /*static const String forgotPassword = baseURL + "/forgot-password";*/
 }

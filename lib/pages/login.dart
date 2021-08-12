@@ -20,7 +20,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     final emailField = TextFormField(
       autofocus: false,
-      //validator: validateEmail,
+      validator: validateEmail,
       onSaved: (value) => _username = value,
       decoration: buildInputDecoration("E-Mail eingeben", Icons.email),
     );
@@ -69,11 +69,11 @@ class _LoginState extends State<Login> {
             context.read<UserProvider>().setUser(user);
             Navigator.pushReplacementNamed(context, '/dashboard');
           } else {
-            SnackBar(content: Text('Failed Login: ' + response['message']['message'].toString()));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['message'])));
           }
         });
       } else {
-        print("form is invalid");
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Bitte alles richtig ausfüllen.')));
       }
     };
 

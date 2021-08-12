@@ -24,21 +24,22 @@ class _DashBoardState extends State<DashBoard> {
       appBar: AppBar(
         title: Text("DASHBOARD PAGE"),
         elevation: 0.1,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.settings,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
+          )
+        ],
       ),
       body: Column(
         children: [
           SizedBox(height: 100,),
           Center(child: Text(user != null ? user.email : '')),
-          SizedBox(height: 100),
-          RaisedButton(
-            onPressed: (){
-              UserPreferences().removeUser();
-              context.read<UserProvider>().setUser(null);
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-            child: Text("Logout"),
-            color: Colors.lightBlueAccent,
-          )
         ],
       ),
     );

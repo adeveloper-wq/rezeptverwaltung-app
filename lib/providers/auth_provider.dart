@@ -105,15 +105,38 @@ class AuthProvider with ChangeNotifier {
         notifyListeners();
         result = {
           'status': false,
-          'message': json.decode(responseUser.body)['error']
+          'message': 'Serverfehler'
         };
       }
-    } else {
+    }else if(response.statusCode == 401){
       _state = Status.LoggedOut;
       notifyListeners();
       result = {
         'status': false,
-        'message': json.decode(response.body)['error']
+        'message': 'E-Mail oder Passwort falsch.'
+      };
+    }else if(response.statusCode == 422){
+      if(json.decode(response.body)['email'][0] == "The email has already been taken."){
+        _state = Status.LoggedOut;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': 'Die E-Mail existiert bereits.'
+        };
+      }else{
+        _state = Status.LoggedOut;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': 'Server: Fehlende Eingaben oder E-Mail ist im falschen Format.'
+        };
+      }
+    }else {
+      _state = Status.LoggedOut;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Serverfehler'
       };
     }
     return result;

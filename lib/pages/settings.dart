@@ -57,7 +57,7 @@ class _SettingsState extends State<Settings> {
             onPressed: (){
               UserPreferences().removeUser();
               context.read<UserProvider>().setUser(null);
-              Navigator.pushReplacementNamed(context, '/login');
+              Navigator.pop(context);
             },
             child: Text("Logout"),
             color: Colors.lightBlueAccent,

@@ -9,5 +9,6 @@ class AppUrl {
   static const String refresh = "/app/public/auth/refresh";
 
   static const String getGroup = "/app/public/api/group/";
+  static const String joinGroup = "/app/public/api/group/join";
   /*static const String forgotPassword = baseURL + "/forgot-password";*/
 }

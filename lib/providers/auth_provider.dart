@@ -7,6 +7,7 @@ import 'package:http/http.dart';
 import 'package:rezeptverwaltung/domains/user.dart';
 import 'package:rezeptverwaltung/util/app_url.dart';
 import 'package:rezeptverwaltung/util/user_preferences.dart';
+import 'package:rezeptverwaltung/util/message_convert.dart';
 
 
 enum Status {
@@ -32,15 +33,12 @@ class AuthProvider with ChangeNotifier {
     _state = Status.Loading;
     notifyListeners();
 
-    Response response = await post(
+    return await post(
       Uri.https(AppUrl.baseURL, AppUrl.login, queryParameters),
       //body: json.encode(loginData),
       //headers: {'Content-Type': 'application/json'},
-    );
-
-    result = await getUser(response);
-
-    return result;
+    ) .then(onValue)
+      .catchError(onError);
   }
 
   Future<Map<String, dynamic>> register(String email, String name, String password) async {
@@ -69,8 +67,8 @@ class AuthProvider with ChangeNotifier {
   }
 
   static onError(error) {
-    print("the error is $error.detail");
-    return {'status': false, 'message': 'Unsuccessful Request', 'data': error};
+    print("the error is: $error");
+    return {'status': false, 'message': 'Fehler: $error', 'data': error};
   }
 
   Future<Map<String, dynamic>> getUser(Response response) async{
@@ -108,35 +106,12 @@ class AuthProvider with ChangeNotifier {
           'message': 'Serverfehler'
         };
       }
-    }else if(response.statusCode == 401){
+    }else{
       _state = Status.LoggedOut;
       notifyListeners();
       result = {
         'status': false,
-        'message': 'E-Mail oder Passwort falsch.'
-      };
-    }else if(response.statusCode == 422){
-      if(json.decode(response.body)['email'][0] == "The email has already been taken."){
-        _state = Status.LoggedOut;
-        notifyListeners();
-        result = {
-          'status': false,
-          'message': 'Die E-Mail existiert bereits.'
-        };
-      }else{
-        _state = Status.LoggedOut;
-        notifyListeners();
-        result = {
-          'status': false,
-          'message': 'Server: Fehlende Eingaben oder E-Mail ist im falschen Format.'
-        };
-      }
-    }else {
-      _state = Status.LoggedOut;
-      notifyListeners();
-      result = {
-        'status': false,
-        'message': 'Serverfehler'
+        'message': convertErrorMessage(json.decode(response.body))
       };
     }
     return result;

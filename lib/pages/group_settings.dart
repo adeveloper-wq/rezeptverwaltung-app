@@ -19,10 +19,27 @@ class _GroupSettingsState extends State<GroupSettings> {
   String _password;
 
   Map<String,dynamic> _foundGroup;
+  List<dynamic> _userGroups;
+
+  void getGroups() {
+    final Future<Map<String, dynamic>> successfulMessage =
+    context.read<GroupProvider>().getGroups();
+
+    successfulMessage.then((response) {
+      if (response['status']) {
+        _userGroups = response['data'];
+        print("üüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüüü");
+        print(_userGroups);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['message'])));
+      }
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    this.getGroups();
   }
 
   @override
@@ -146,6 +163,18 @@ class _GroupSettingsState extends State<GroupSettings> {
       ),
       body: Column(
         children: [
+          if(_userGroups != null)
+             // Handle your callback
+                Container(
+                  width: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for(var item in _userGroups )
+                        InkWell(onTap: () {},child: Text(item['name'])),
+                    ],
+                  ),
+            ),
           Form(
             key: _formKeySearch,
             child: Column(

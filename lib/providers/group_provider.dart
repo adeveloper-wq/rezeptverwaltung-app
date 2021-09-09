@@ -22,10 +22,16 @@ enum GroupJoiningLoadingStatus{
   Loading
 }
 
+enum GroupsLoadingStatus{
+  NotLoading,
+  Loading
+}
+
 class GroupProvider with ChangeNotifier {
 
   GroupLoadingStatus _state = GroupLoadingStatus.NotLoading;
   GroupJoiningLoadingStatus _stateJoining = GroupJoiningLoadingStatus.NotLoading;
+  GroupsLoadingStatus _stateGroupsLoading = GroupsLoadingStatus.NotLoading;
 
   GroupLoadingStatus get state => _state;
   GroupJoiningLoadingStatus get stateJoining => _stateJoining;
@@ -92,6 +98,43 @@ class GroupProvider with ChangeNotifier {
         result = {'status': true, 'message': 'Erfolgreich beigetreten!'};
       }else{
         _stateJoining = GroupJoiningLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': convertErrorMessage(json.decode(response.body))
+        };
+      }
+    }else{
+      _stateJoining = GroupJoiningLoadingStatus.NotLoading;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Kein Token verfügbar!'
+      };
+    }
+
+    return result;
+  }
+
+  Future<Map<String,dynamic>> getGroups() async {
+    _stateGroupsLoading = GroupsLoadingStatus.Loading;
+    Map<String, dynamic> result;
+
+    String token = await UserPreferences().getToken();
+
+    if(token != null){
+      Response response = await get(
+          Uri.https(AppUrl.baseURL, AppUrl.getGroups, {}),
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ' + token
+          }
+      );
+      if (response.statusCode == 200){
+        _stateGroupsLoading = GroupsLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
+      }else{
+        _stateGroupsLoading = GroupsLoadingStatus.NotLoading;
         notifyListeners();
         result = {
           'status': false,

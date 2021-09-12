@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:rezeptverwaltung/domains/user.dart';
 import 'package:rezeptverwaltung/providers/auth_refresh_provider.dart';
 import 'package:rezeptverwaltung/providers/group_provider.dart';
+import 'package:rezeptverwaltung/providers/receipt_provider.dart';
 import 'package:rezeptverwaltung/providers/user_provider.dart';
 import 'package:rezeptverwaltung/util/user_preferences.dart';
 
@@ -14,6 +15,7 @@ class DashBoard extends StatefulWidget {
 class _DashBoardState extends State<DashBoard> {
   User user;
   List<dynamic> _userGroups;
+  List<dynamic> _receipts;
 
   int _activeGroupId;
 
@@ -29,6 +31,25 @@ class _DashBoardState extends State<DashBoard> {
         setState(() {
           _activeGroupId = _userGroups[0]['G_ID'];
         });
+        getReceipts();
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(response['message'])));
+      }
+    });
+  }
+
+  void getReceipts(){
+    final Future<Map<String, dynamic>> successfulMessage =
+    context.read<ReceiptProvider>().getReceipts(_activeGroupId);
+
+    successfulMessage.then((response) {
+      print(response);
+      if (response['status']) {
+        setState(() {
+          _receipts = response['data'];
+        });
+
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(response['message'])));
@@ -49,6 +70,7 @@ class _DashBoardState extends State<DashBoard> {
       setState(() {
         _activeGroupId = id;
       });
+      getReceipts();
     };
 
     return Scaffold(
@@ -88,6 +110,37 @@ class _DashBoardState extends State<DashBoard> {
                                   ? Colors.grey
                                   : Colors.transparent),
                         )),
+                ],
+              ),
+            ),
+          SizedBox(
+            height: 20,
+          ),
+          if (_receipts != null)
+          // Handle your callback
+            Container(
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (var item in _receipts)
+                    InkWell(
+                        onTap: () {
+
+                        },
+                        child: Card(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              ListTile(
+                                leading: Icon(Icons.fastfood),
+                                title: Text(item['titel']),
+                                subtitle: Text('Portionen: ' + item['portionen']),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ),
                 ],
               ),
             ),

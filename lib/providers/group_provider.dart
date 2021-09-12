@@ -35,6 +35,7 @@ class GroupProvider with ChangeNotifier {
 
   GroupLoadingStatus get state => _state;
   GroupJoiningLoadingStatus get stateJoining => _stateJoining;
+  GroupsLoadingStatus get stateGroupsLoading => _stateGroupsLoading;
 
   Future<Map<String,dynamic>> getGroup(String name) async {
     _state = GroupLoadingStatus.Loading;

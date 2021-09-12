@@ -8,6 +8,7 @@ import 'package:rezeptverwaltung/pages/settings.dart';
 import 'package:rezeptverwaltung/providers/auth_provider.dart';
 import 'package:rezeptverwaltung/providers/auth_refresh_provider.dart';
 import 'package:rezeptverwaltung/providers/group_provider.dart';
+import 'package:rezeptverwaltung/providers/receipt_provider.dart';
 import 'package:rezeptverwaltung/providers/user_provider.dart';
 
 void main() {
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (_) => AuthProvider()),
           ChangeNotifierProvider(create: (_) => UserProvider()),
           ChangeNotifierProvider(create: (_) => GroupProvider()),
+          ChangeNotifierProvider(create: (_) => ReceiptProvider()),
         ],
         child: MyAppStateful()
     );

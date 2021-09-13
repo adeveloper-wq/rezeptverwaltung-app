@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rezeptverwaltung/domains/user.dart';
+import 'package:rezeptverwaltung/pages/receipt.dart';
 import 'package:rezeptverwaltung/providers/auth_refresh_provider.dart';
 import 'package:rezeptverwaltung/providers/group_provider.dart';
 import 'package:rezeptverwaltung/providers/receipt_provider.dart';
@@ -126,7 +127,7 @@ class _DashBoardState extends State<DashBoard> {
                   for (var item in _receipts)
                     InkWell(
                         onTap: () {
-
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => Receipt(item['R_ID'])));
                         },
                         child: Card(
                           child: Column(

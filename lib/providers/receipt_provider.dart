@@ -15,11 +15,18 @@ enum GetReceiptsLoadingStatus {
   Loading
 }
 
+enum GetStepsLoadingStatus {
+  NotLoading,
+  Loading
+}
+
 class ReceiptProvider with ChangeNotifier {
 
   GetReceiptsLoadingStatus _state = GetReceiptsLoadingStatus.NotLoading;
+  GetStepsLoadingStatus _stateSteps = GetStepsLoadingStatus.NotLoading;
 
   GetReceiptsLoadingStatus get state => _state;
+  GetStepsLoadingStatus get stateSteps => _stateSteps;
 
   Future<Map<String,dynamic>> getReceipts(int groupId) async {
     _state = GetReceiptsLoadingStatus.Loading;
@@ -53,6 +60,48 @@ class ReceiptProvider with ChangeNotifier {
       }
     }else{
       _state = GetReceiptsLoadingStatus.NotLoading;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Kein Token verfügbar!'
+      };
+    }
+
+    return result;
+  }
+
+  Future<Map<String,dynamic>> getSteps(int receiptId) async {
+    _stateSteps = GetStepsLoadingStatus.Loading;
+    Map<String, dynamic> result;
+
+    String token = await UserPreferences().getToken();
+
+    if(token != null){
+      final queryParameters = {
+        'R_ID': receiptId.toString()
+      };
+
+      Response response = await get(
+          Uri.https(AppUrl.baseURL, AppUrl.getSteps, queryParameters),
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ' + token
+          }
+      );
+
+      if (response.statusCode == 200){
+        _stateSteps = GetStepsLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
+      }else{
+        _stateSteps = GetStepsLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': convertErrorMessage(json.decode(response.body))
+        };
+      }
+    }else{
+      _stateSteps = GetStepsLoadingStatus.NotLoading;
       notifyListeners();
       result = {
         'status': false,

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:rezeptverwaltung/pages/dashboard.dart';
 import 'package:rezeptverwaltung/pages/group_settings.dart';
 import 'package:rezeptverwaltung/pages/login.dart';
+import 'package:rezeptverwaltung/pages/receipt.dart';
 import 'package:rezeptverwaltung/pages/register.dart';
 import 'package:rezeptverwaltung/pages/settings.dart';
 import 'package:rezeptverwaltung/providers/auth_provider.dart';

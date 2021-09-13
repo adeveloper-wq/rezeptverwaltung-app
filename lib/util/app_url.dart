@@ -13,5 +13,6 @@ class AppUrl {
   static const String getGroups = "/app/public/api/group";
 
   static const String getReceipts = "/app/public/api/receipt";
+  static const String getSteps = "/app/public/api/receipt/steps";
   /*static const String forgotPassword = baseURL + "/forgot-password";*/
 }

@@ -20,13 +20,34 @@ enum GetStepsLoadingStatus {
   Loading
 }
 
+enum GetIngredientsLoadingStatus {
+  NotLoading,
+  Loading
+}
+
+enum GetIngredientNamesLoadingStatus {
+  NotLoading,
+  Loading
+}
+
+enum GetUnitNamesLoadingStatus {
+  NotLoading,
+  Loading
+}
+
 class ReceiptProvider with ChangeNotifier {
 
   GetReceiptsLoadingStatus _state = GetReceiptsLoadingStatus.NotLoading;
   GetStepsLoadingStatus _stateSteps = GetStepsLoadingStatus.NotLoading;
+  GetIngredientsLoadingStatus _stateIngredients = GetIngredientsLoadingStatus.NotLoading;
+  GetIngredientNamesLoadingStatus _stateIngredientNames = GetIngredientNamesLoadingStatus.NotLoading;
+  GetUnitNamesLoadingStatus _stateUnitNames = GetUnitNamesLoadingStatus.NotLoading;
 
   GetReceiptsLoadingStatus get state => _state;
   GetStepsLoadingStatus get stateSteps => _stateSteps;
+  GetIngredientsLoadingStatus get stateIngredients => _stateIngredients;
+  GetIngredientNamesLoadingStatus get stateIngredientNames => _stateIngredientNames;
+  GetUnitNamesLoadingStatus get stateUnitNames => _stateUnitNames;
 
   Future<Map<String,dynamic>> getReceipts(int groupId) async {
     _state = GetReceiptsLoadingStatus.Loading;
@@ -102,6 +123,135 @@ class ReceiptProvider with ChangeNotifier {
       }
     }else{
       _stateSteps = GetStepsLoadingStatus.NotLoading;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Kein Token verfügbar!'
+      };
+    }
+
+    return result;
+  }
+
+  Future<Map<String,dynamic>> getIngredients(int receiptId) async {
+    _stateIngredients = GetIngredientsLoadingStatus.Loading;
+    Map<String, dynamic> result;
+
+    String token = await UserPreferences().getToken();
+
+    if(token != null){
+      final queryParameters = {
+        'R_ID': receiptId.toString()
+      };
+
+      Response response = await get(
+          Uri.https(AppUrl.baseURL, AppUrl.getIngredients, queryParameters),
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ' + token
+          }
+      );
+
+      if (response.statusCode == 200){
+        _stateIngredients = GetIngredientsLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
+      }else{
+        _stateIngredients = GetIngredientsLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': convertErrorMessage(json.decode(response.body))
+        };
+      }
+    }else{
+        _stateIngredients = GetIngredientsLoadingStatus.NotLoading;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Kein Token verfügbar!'
+      };
+    }
+
+    return result;
+  }
+
+  Future<Map<String,dynamic>> getIngredientNames(List<String> ingredientIds) async {
+    _stateIngredientNames = GetIngredientNamesLoadingStatus.Loading;
+    Map<String, dynamic> result;
+
+    String token = await UserPreferences().getToken();
+
+    if(token != null){
+      print(ingredientIds);
+      final queryParameters = {
+        'Z_IDs[]': ingredientIds
+      };
+      print(queryParameters);
+
+      Response response = await get(
+          Uri.https(AppUrl.baseURL, AppUrl.getIngredientNames, queryParameters),
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ' + token
+          }
+      );
+      print("asefuihruishruiofghseuiorghiosehrguiosehrioguhseruioghseuiohrgsehorgiusehriogusheiorughseuiorgh");
+      print(response);
+      if (response.statusCode == 200){
+        _stateIngredientNames = GetIngredientNamesLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
+      }else{
+        _stateIngredientNames = GetIngredientNamesLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': convertErrorMessage(json.decode(response.body))
+        };
+      }
+    }else{
+      _stateIngredientNames = GetIngredientNamesLoadingStatus.NotLoading;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Kein Token verfügbar!'
+      };
+    }
+
+    return result;
+  }
+
+  Future<Map<String,dynamic>> getUnitNames(List<String> unitIds) async {
+    _stateUnitNames = GetUnitNamesLoadingStatus.Loading;
+    Map<String, dynamic> result;
+
+    String token = await UserPreferences().getToken();
+
+    if(token != null){
+      final queryParameters = {
+        'E_IDs[]': unitIds
+      };
+
+      Response response = await get(
+          Uri.https(AppUrl.baseURL, AppUrl.getUnits, queryParameters),
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ' + token
+          }
+      );
+
+      if (response.statusCode == 200){
+        _stateUnitNames = GetUnitNamesLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
+      }else{
+        _stateUnitNames = GetUnitNamesLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': convertErrorMessage(json.decode(response.body))
+        };
+      }
+    }else{
+      _stateUnitNames = GetUnitNamesLoadingStatus.NotLoading;
       notifyListeners();
       result = {
         'status': false,

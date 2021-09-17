@@ -127,7 +127,7 @@ class _DashBoardState extends State<DashBoard> {
                   for (var item in _receipts)
                     InkWell(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => Receipt(item['R_ID'])));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => Receipt(item)));
                         },
                         child: Card(
                           child: Column(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:rezeptverwaltung/pages/dashboard.dart';
 import 'package:rezeptverwaltung/pages/group_settings.dart';
 import 'package:rezeptverwaltung/pages/login.dart';
+import 'package:rezeptverwaltung/pages/new_receipt.dart';
 import 'package:rezeptverwaltung/pages/receipt.dart';
 import 'package:rezeptverwaltung/pages/register.dart';
 import 'package:rezeptverwaltung/pages/settings.dart';
@@ -63,6 +64,7 @@ class _MyAppState extends State<MyAppStateful>{
             '/register': (context) => Register(),
             '/settings': (context) => Settings(),
             '/group_settings': (context) => GroupSettings(),
+            '/new_receipt': (context) => NewReceipt(),
           }
     );
   }

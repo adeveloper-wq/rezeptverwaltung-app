@@ -151,6 +151,13 @@ class _DashBoardState extends State<DashBoard> {
           Center(child: Text(user != null ? user.email : '')),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/new_receipt');
+        },
+        child: const Icon(Icons.add),
+        backgroundColor: Colors.green,
+      ),
     );
   }
 }

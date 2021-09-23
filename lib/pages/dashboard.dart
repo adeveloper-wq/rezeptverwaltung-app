@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rezeptverwaltung/domains/user.dart';
+import 'package:rezeptverwaltung/pages/new_receipt.dart';
 import 'package:rezeptverwaltung/pages/receipt.dart';
 import 'package:rezeptverwaltung/providers/auth_refresh_provider.dart';
 import 'package:rezeptverwaltung/providers/group_provider.dart';
@@ -153,7 +154,7 @@ class _DashBoardState extends State<DashBoard> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamed(context, '/new_receipt');
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => NewReceipt(_activeGroupId)));
         },
         child: const Icon(Icons.add),
         backgroundColor: Colors.green,

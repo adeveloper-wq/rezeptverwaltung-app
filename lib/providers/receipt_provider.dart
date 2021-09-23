@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:rezeptverwaltung/domains/receipt.dart';
 import 'package:rezeptverwaltung/util/app_url.dart';
 import 'package:rezeptverwaltung/util/message_convert.dart';
 import 'package:rezeptverwaltung/util/user_preferences.dart';
@@ -35,6 +36,21 @@ enum GetUnitNamesLoadingStatus {
   Loading
 }
 
+enum GetAllUnitsLoadingStatus {
+  NotLoading,
+  Loading
+}
+
+enum GetAllTagsLoadingStatus {
+  NotLoading,
+  Loading
+}
+
+enum CreateReceiptLoadingStatus {
+  NotLoading,
+  Loading
+}
+
 class ReceiptProvider with ChangeNotifier {
 
   GetReceiptsLoadingStatus _state = GetReceiptsLoadingStatus.NotLoading;
@@ -42,12 +58,18 @@ class ReceiptProvider with ChangeNotifier {
   GetIngredientsLoadingStatus _stateIngredients = GetIngredientsLoadingStatus.NotLoading;
   GetIngredientNamesLoadingStatus _stateIngredientNames = GetIngredientNamesLoadingStatus.NotLoading;
   GetUnitNamesLoadingStatus _stateUnitNames = GetUnitNamesLoadingStatus.NotLoading;
+  GetAllUnitsLoadingStatus _stateGetAllUnits = GetAllUnitsLoadingStatus.NotLoading;
+  GetAllTagsLoadingStatus _stateGetAllTags = GetAllTagsLoadingStatus.NotLoading;
+  CreateReceiptLoadingStatus _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
 
   GetReceiptsLoadingStatus get state => _state;
   GetStepsLoadingStatus get stateSteps => _stateSteps;
   GetIngredientsLoadingStatus get stateIngredients => _stateIngredients;
   GetIngredientNamesLoadingStatus get stateIngredientNames => _stateIngredientNames;
   GetUnitNamesLoadingStatus get stateUnitNames => _stateUnitNames;
+  GetAllUnitsLoadingStatus get stateGetAllUnits => _stateGetAllUnits;
+  GetAllTagsLoadingStatus get stateGetAllTags => _stateGetAllTags;
+  CreateReceiptLoadingStatus get stateCreateReceipt => _stateCreateReceipt;
 
   Future<Map<String,dynamic>> getReceipts(int groupId) async {
     _state = GetReceiptsLoadingStatus.Loading;
@@ -252,6 +274,136 @@ class ReceiptProvider with ChangeNotifier {
       }
     }else{
       _stateUnitNames = GetUnitNamesLoadingStatus.NotLoading;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Kein Token verfügbar!'
+      };
+    }
+
+    return result;
+  }
+
+  Future<Map<String,dynamic>> getAllUnits() async {
+    _stateGetAllUnits = GetAllUnitsLoadingStatus.Loading;
+    Map<String, dynamic> result;
+
+    String token = await UserPreferences().getToken();
+
+    if(token != null){
+
+
+      Response response = await get(
+          Uri.https(AppUrl.baseURL, AppUrl.getAllUnits, {}),
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ' + token
+          }
+      );
+
+      if (response.statusCode == 200){
+        _stateGetAllUnits = GetAllUnitsLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
+      }else{
+        _stateGetAllUnits = GetAllUnitsLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': convertErrorMessage(json.decode(response.body))
+        };
+      }
+    }else{
+      _stateGetAllUnits = GetAllUnitsLoadingStatus.NotLoading;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Kein Token verfügbar!'
+      };
+    }
+
+    return result;
+  }
+
+  Future<Map<String,dynamic>> getAllTags() async {
+    _stateGetAllTags = GetAllTagsLoadingStatus.Loading;
+    Map<String, dynamic> result;
+
+    String token = await UserPreferences().getToken();
+
+    if(token != null){
+
+
+      Response response = await get(
+          Uri.https(AppUrl.baseURL, AppUrl.getAllTags, {}),
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ' + token
+          }
+      );
+
+      if (response.statusCode == 200){
+        _stateGetAllTags = GetAllTagsLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
+      }else{
+        _stateGetAllTags = GetAllTagsLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': convertErrorMessage(json.decode(response.body))
+        };
+      }
+    }else{
+      _stateGetAllTags = GetAllTagsLoadingStatus.NotLoading;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Kein Token verfügbar!'
+      };
+    }
+
+    return result;
+  }
+
+  Future<Map<String,dynamic>> createReceipt(Receipt receipt) async {
+    _stateCreateReceipt = CreateReceiptLoadingStatus.Loading;
+    Map<String, dynamic> result;
+
+    String token = await UserPreferences().getToken();
+
+    if(token != null){
+      final queryParameters = {
+        'groupId': receipt.groupId,
+        'name': receipt.name,
+        'portions': receipt.portions.toString(),
+        'workingTime': receipt.workingTime.toString(),
+        'cookingTime': receipt.cookingTime.toString(),
+        'restTime': receipt.restTime.toString(),
+        'tagIds[]': receipt.getTagIdStrings(),
+        'ingredients': json.encode(receipt.ingredients),
+        'steps': json.encode(receipt.steps)
+      };
+
+      Response response = await post(
+          Uri.https(AppUrl.baseURL, AppUrl.createReceipt, queryParameters),
+          headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ' + token
+          }
+      );
+
+      if (response.statusCode == 200){
+        _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
+      }else{
+        _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': convertErrorMessage(json.decode(response.body))
+        };
+      }
+    }else{
+      _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
       notifyListeners();
       result = {
         'status': false,

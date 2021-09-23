@@ -64,7 +64,6 @@ class _MyAppState extends State<MyAppStateful>{
             '/register': (context) => Register(),
             '/settings': (context) => Settings(),
             '/group_settings': (context) => GroupSettings(),
-            '/new_receipt': (context) => NewReceipt(),
           }
     );
   }

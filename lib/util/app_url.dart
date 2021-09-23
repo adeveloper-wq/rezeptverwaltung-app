@@ -13,9 +13,12 @@ class AppUrl {
   static const String getGroups = "/app/public/api/group";
 
   static const String getReceipts = "/app/public/api/receipt";
+  static const String createReceipt = "/app/public/api/receipt";
   static const String getSteps = "/app/public/api/receipt/steps";
   static const String getIngredients = "/app/public/api/receipt/ingredient";
   static const String getIngredientNames = "/app/public/api/receipt/ingredient/names";
   static const String getUnits = "/app/public/api/receipt/unit";
+  static const String getAllUnits = "/app/public/api/unit";
+  static const String getAllTags = "/app/public/api/tag";
   /*static const String forgotPassword = baseURL + "/forgot-password";*/
 }

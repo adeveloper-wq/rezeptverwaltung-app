@@ -327,7 +327,7 @@ class ReceiptProvider with ChangeNotifier {
 
     if(token != null){
       final queryParameters = {
-        'groupId': receipt.groupId,
+        'groupId': receipt.groupId.toString(),
         'name': receipt.name,
         'portions': receipt.portions.toString(),
         'workingTime': receipt.workingTime.toString(),
@@ -348,7 +348,7 @@ class ReceiptProvider with ChangeNotifier {
       if (response.statusCode == 200){
         _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
         notifyListeners();
-        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
+        result = {'status': true, 'message': 'Erfolgreich', 'data': json.decode(response.body)};
       }else{
         _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
         notifyListeners();

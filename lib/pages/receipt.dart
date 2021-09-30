@@ -16,7 +16,6 @@ class Receipt extends StatefulWidget {
 class _ReceiptState extends State<Receipt> {
   List<dynamic> _steps;
   List<dynamic> _ingredients;
-  List<dynamic> _ingredientNames;
   List<dynamic> _unitNames;
 
   void getSteps() {
@@ -45,37 +44,12 @@ class _ReceiptState extends State<Receipt> {
           _ingredients = response['data'];
         });
         print(_ingredients);
-        getIngredientNames();
         getUnitNames();
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(response['message'])));
       }
     });
-  }
-
-  void getIngredientNames(){
-    List<String> ingredientIds = [];
-    if(_ingredients.isNotEmpty){
-      _ingredients.forEach((value) {
-        ingredientIds.add(value['Z_ID']);
-      });
-
-      final Future<Map<String, dynamic>> successfulMessage =
-      context.read<ReceiptProvider>().getIngredientNames([...{...ingredientIds}]);
-
-      successfulMessage.then((response) {
-        if (response['status']) {
-          setState(() {
-            _ingredientNames = response['data'];
-          });
-          print(_ingredientNames);
-        } else {
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(response['message'])));
-        }
-      });
-    }
   }
 
   void getUnitNames(){
@@ -145,8 +119,7 @@ class _ReceiptState extends State<Receipt> {
                           children: <Widget>[
                             ListTile(
                               leading: Icon(Icons.fastfood),
-                              title: Text(_ingredientNames != null ? _ingredientNames.firstWhere(
-                                      (element) => element['Z_ID'] == int.parse(item['Z_ID']))['zutat'] : ''),
+                              title: Text(item['name']),
                               subtitle: Text(item['menge'] +
                                   (_unitNames != null ? _unitNames.firstWhere(
                                           (element) => element['E_ID'] == int.parse(item['E_ID']))['einheit'] : '')

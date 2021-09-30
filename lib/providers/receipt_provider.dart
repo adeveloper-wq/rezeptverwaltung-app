@@ -197,51 +197,6 @@ class ReceiptProvider with ChangeNotifier {
     return result;
   }
 
-  Future<Map<String,dynamic>> getIngredientNames(List<String> ingredientIds) async {
-    _stateIngredientNames = GetIngredientNamesLoadingStatus.Loading;
-    Map<String, dynamic> result;
-
-    String token = await UserPreferences().getToken();
-
-    if(token != null){
-      print(ingredientIds);
-      final queryParameters = {
-        'Z_IDs[]': ingredientIds
-      };
-      print(queryParameters);
-
-      Response response = await get(
-          Uri.https(AppUrl.baseURL, AppUrl.getIngredientNames, queryParameters),
-          headers: {
-            HttpHeaders.authorizationHeader: 'Bearer ' + token
-          }
-      );
-      print("asefuihruishruiofghseuiorghiosehrguiosehrioguhseruioghseuiohrgsehorgiusehriogusheiorughseuiorgh");
-      print(response);
-      if (response.statusCode == 200){
-        _stateIngredientNames = GetIngredientNamesLoadingStatus.NotLoading;
-        notifyListeners();
-        result = {'status': true, 'message': 'Successful', 'data': json.decode(response.body)};
-      }else{
-        _stateIngredientNames = GetIngredientNamesLoadingStatus.NotLoading;
-        notifyListeners();
-        result = {
-          'status': false,
-          'message': convertErrorMessage(json.decode(response.body))
-        };
-      }
-    }else{
-      _stateIngredientNames = GetIngredientNamesLoadingStatus.NotLoading;
-      notifyListeners();
-      result = {
-        'status': false,
-        'message': 'Kein Token verfügbar!'
-      };
-    }
-
-    return result;
-  }
-
   Future<Map<String,dynamic>> getUnitNames(List<String> unitIds) async {
     _stateUnitNames = GetUnitNamesLoadingStatus.Loading;
     Map<String, dynamic> result;

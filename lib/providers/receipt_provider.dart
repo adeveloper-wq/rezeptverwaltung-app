@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart' as dio;
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -348,13 +349,63 @@ class ReceiptProvider with ChangeNotifier {
       if (response.statusCode == 200){
         _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
         notifyListeners();
-        result = {'status': true, 'message': 'Erfolgreich', 'data': json.decode(response.body)};
+        result = {'status': true, 'message': 'Erfolgreich'};
       }else{
         _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
         notifyListeners();
         result = {
           'status': false,
           'message': convertErrorMessage(json.decode(response.body))
+        };
+      }
+    }else{
+      _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
+      notifyListeners();
+      result = {
+        'status': false,
+        'message': 'Kein Token verfügbar!'
+      };
+    }
+
+    return result;
+  }
+
+  Future<Map<String,dynamic>> uploadReceiptImages(List<String> filepaths) async {
+    _stateCreateReceipt = CreateReceiptLoadingStatus.Loading;
+    Map<String, dynamic> result;
+
+    String token = await UserPreferences().getToken();
+
+    if(token != null){
+      dio.Dio dioInstance = dio.Dio();
+
+      var formData = dio.FormData();
+      for (var file in filepaths) {
+        formData.files.addAll([
+          MapEntry("assignment", await dio.MultipartFile.fromFile(file)),
+        ]);
+      }
+
+      final queryParameters = {
+
+      };
+      // https://stackoverflow.com/questions/63263840/how-to-upload-multiple-images-files-in-flutter-using-dio
+      dio.Response response = await dioInstance.post("https://" + AppUrl.baseURL + AppUrl.uploadReceiptImages,
+          data: formData,
+          options: dio.Options(headers: {
+            HttpHeaders.authorizationHeader: 'Bearer ' + token
+          }));
+
+      if (response.statusCode == 200){
+        _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {'status': true, 'message': 'Erfolgreicher Bilderupload'};
+      }else{
+        _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
+        notifyListeners();
+        result = {
+          'status': false,
+          'message': convertErrorMessage(json.decode(response.data))
         };
       }
     }else{

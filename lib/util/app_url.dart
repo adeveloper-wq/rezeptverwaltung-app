@@ -14,6 +14,7 @@ class AppUrl {
 
   static const String getReceipts = "/app/public/api/receipt";
   static const String createReceipt = "/app/public/api/receipt";
+  static const String uploadReceiptImages = "/app/public/api/receipt/image";
   static const String getSteps = "/app/public/api/receipt/steps";
   static const String getIngredients = "/app/public/api/receipt/ingredient";
   static const String getUnits = "/app/public/api/receipt/unit";

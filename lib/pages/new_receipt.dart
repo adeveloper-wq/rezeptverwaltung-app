@@ -186,6 +186,27 @@ class _NewReceiptState extends State<NewReceipt> {
       }
     };
 
+    final uploadImages = () {
+      List<String> imagePaths;
+
+      images.map((image) => {
+        imagePaths.add(image.path)
+      });
+
+      final Future<Map<String, dynamic>> successfulMessage =
+      context.read<ReceiptProvider>().uploadReceiptImages(imagePaths);
+
+      successfulMessage.then((response) {
+        if (response['status']) {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['message'])));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(response['message'])));
+        }
+      });
+    };
+
     final upload = () {
       final form = formKey.currentState;
 
@@ -200,6 +221,7 @@ class _NewReceiptState extends State<NewReceipt> {
           if (response['status']) {
             ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(response['message'])));
+            uploadImages();
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(response['message'])));

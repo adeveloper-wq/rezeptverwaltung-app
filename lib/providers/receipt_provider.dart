@@ -349,7 +349,7 @@ class ReceiptProvider with ChangeNotifier {
       if (response.statusCode == 200){
         _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
         notifyListeners();
-        result = {'status': true, 'message': 'Erfolgreich'};
+        result = {'status': true, 'message': 'Erfolgreich', 'data': json.decode(response.body)};
       }else{
         _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
         notifyListeners();
@@ -370,7 +370,7 @@ class ReceiptProvider with ChangeNotifier {
     return result;
   }
 
-  Future<Map<String,dynamic>> uploadReceiptImages(List<String> filepaths) async {
+  Future<Map<String,dynamic>> uploadReceiptImages(List<String> filepaths, int receiptId) async {
     _stateCreateReceipt = CreateReceiptLoadingStatus.Loading;
     Map<String, dynamic> result;
 
@@ -380,21 +380,30 @@ class ReceiptProvider with ChangeNotifier {
       dio.Dio dioInstance = dio.Dio();
 
       var formData = dio.FormData();
+      print(filepaths);
       for (var file in filepaths) {
         formData.files.addAll([
-          MapEntry("assignment", await dio.MultipartFile.fromFile(file)),
+          MapEntry("image[]", await dio.MultipartFile.fromFile(file)),
         ]);
       }
 
       final queryParameters = {
-
+        'receiptId': receiptId
       };
       // https://stackoverflow.com/questions/63263840/how-to-upload-multiple-images-files-in-flutter-using-dio
-      dio.Response response = await dioInstance.post("https://" + AppUrl.baseURL + AppUrl.uploadReceiptImages,
+
+      dio.Response response = await dioInstance.post("https://" + AppUrl.baseURL + AppUrl.uploadReceiptImages, queryParameters: queryParameters,
           data: formData,
-          options: dio.Options(headers: {
-            HttpHeaders.authorizationHeader: 'Bearer ' + token
-          }));
+          options: dio.Options(
+              headers: {
+                HttpHeaders.authorizationHeader: 'Bearer ' + token
+              },
+              followRedirects: false,
+              validateStatus: (status) {
+                return status < 500;
+              },
+          )
+      );
 
       if (response.statusCode == 200){
         _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
@@ -403,6 +412,7 @@ class ReceiptProvider with ChangeNotifier {
       }else{
         _stateCreateReceipt = CreateReceiptLoadingStatus.NotLoading;
         notifyListeners();
+        print(response.data);
         result = {
           'status': false,
           'message': convertErrorMessage(json.decode(response.data))

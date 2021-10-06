@@ -186,15 +186,13 @@ class _NewReceiptState extends State<NewReceipt> {
       }
     };
 
-    final uploadImages = () {
-      List<String> imagePaths;
+    final uploadImages = (int receiptId) {
+      List<String> imagePaths = [];
 
-      images.map((image) => {
-        imagePaths.add(image.path)
-      });
+      images.forEach((image) => imagePaths.add(image.path));
 
       final Future<Map<String, dynamic>> successfulMessage =
-      context.read<ReceiptProvider>().uploadReceiptImages(imagePaths);
+      context.read<ReceiptProvider>().uploadReceiptImages(imagePaths, receiptId);
 
       successfulMessage.then((response) {
         if (response['status']) {
@@ -221,7 +219,7 @@ class _NewReceiptState extends State<NewReceipt> {
           if (response['status']) {
             ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(response['message'])));
-            uploadImages();
+            uploadImages(response['data']['R_ID']);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(response['message'])));

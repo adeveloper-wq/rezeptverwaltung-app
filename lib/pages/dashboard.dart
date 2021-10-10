@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rezeptverwaltung/domains/response_data.dart';
 import 'package:rezeptverwaltung/domains/user.dart';
 import 'package:rezeptverwaltung/pages/new_receipt.dart';
 import 'package:rezeptverwaltung/pages/receipt.dart';
@@ -42,19 +43,19 @@ class _DashBoardState extends State<DashBoard> {
   }
 
   void getReceipts(){
-    final Future<Map<String, dynamic>> successfulMessage =
+    final Future<ResponseData> result =
     context.read<ReceiptProvider>().getReceipts(_activeGroupId);
 
-    successfulMessage.then((response) {
+    result.then((response) {
       print(response);
-      if (response['status']) {
+      if (response.status) {
         setState(() {
-          _receipts = response['data'];
+          _receipts = response.data;
         });
 
       } else {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(response['message'])));
+            .showSnackBar(SnackBar(content: Text(response.message)));
       }
     });
   }
@@ -91,42 +92,40 @@ class _DashBoardState extends State<DashBoard> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          if (_userGroups != null)
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            if (_userGroups != null)
             // Handle your callback
-            Container(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var item in _userGroups)
-                    InkWell(
-                        onTap: () {
-                          setActiveGroup(item['G_ID']);
-                        },
-                        child: Text(
-                          item['name'],
-                          style: TextStyle(
-                              backgroundColor: _activeGroupId == item['G_ID']
-                                  ? Colors.grey
-                                  : Colors.transparent),
-                        )),
-                ],
+              Container(
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    for (var item in _userGroups)
+                      InkWell(
+                          onTap: () {
+                            setActiveGroup(item['G_ID']);
+                          },
+                          child: Text(
+                            item['name'],
+                            style: TextStyle(
+                                backgroundColor: _activeGroupId == item['G_ID']
+                                    ? Colors.grey
+                                    : Colors.transparent),
+                          )),
+                  ],
+                ),
               ),
-            ),
-          SizedBox(
-            height: 20,
-          ),
-          if (_receipts != null)
-          // Handle your callback
-            Container(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  for (var item in _receipts)
-                    InkWell(
+
+            if (_receipts != null)
+            // Handle your callback
+              Container(
+                width: double.infinity,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (var item in _receipts)
+                      InkWell(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(builder: (context) => Receipt(item)));
                         },
@@ -142,15 +141,16 @@ class _DashBoardState extends State<DashBoard> {
                             ],
                           ),
                         ),
-                    ),
-                ],
+                      ),
+                  ],
+                ),
               ),
+            SizedBox(
+              height: 20,
             ),
-          SizedBox(
-            height: 20,
-          ),
-          Center(child: Text(user != null ? user.email : '')),
-        ],
+            Center(child: Text(user != null ? user.email : '')),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

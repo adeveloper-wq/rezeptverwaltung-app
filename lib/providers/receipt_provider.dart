@@ -7,7 +7,9 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:rezeptverwaltung/domains/receipt.dart';
+import 'package:rezeptverwaltung/domains/response_data.dart';
 import 'package:rezeptverwaltung/util/app_url.dart';
+import 'package:rezeptverwaltung/util/api_manager.dart';
 import 'package:rezeptverwaltung/util/message_convert.dart';
 import 'package:rezeptverwaltung/util/user_preferences.dart';
 
@@ -72,7 +74,24 @@ class ReceiptProvider with ChangeNotifier {
   GetAllTagsLoadingStatus get stateGetAllTags => _stateGetAllTags;
   CreateReceiptLoadingStatus get stateCreateReceipt => _stateCreateReceipt;
 
-  Future<Map<String,dynamic>> getReceipts(int groupId) async {
+  Future<ResponseData> getReceipts(int groupId) async {
+    _state = GetReceiptsLoadingStatus.Loading;
+    ResponseData responseData;
+
+    final queryParameters = {
+      'G_ID': groupId.toString()
+    };
+
+    responseData = await ApiManager.getApiCall(AppUrl.getReceipts, queryParameters)
+        .onError((error, stackTrace) => responseData = new ResponseData(false, 000, error.toString(), null));
+
+    _state = GetReceiptsLoadingStatus.NotLoading;
+    notifyListeners();
+
+    return responseData;
+  }
+
+  Future<Map<String,dynamic>> getReceiptsOld(int groupId) async {
     _state = GetReceiptsLoadingStatus.Loading;
     Map<String, dynamic> result;
 
